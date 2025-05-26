@@ -1,0 +1,158 @@
+---
+title: "Actividad transversal 4- Módulo 4"
+author: "Melissa Guadalupe Reyes García"
+date:  "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Semana 1 y 2
+Introducción:
+El presente informe tiene como objetivo realizar una análisis del dataset de POkémon extraido de Kaggel, el cual contiene información de 697 animales Pokémon. Este dataset incluye estadísticas de combate como HP, Attack, Defense, Speed, etc., además de clasificaciones por tipo, generación y sí el Pokémon es legendario. 
+El análisis busca responder a preguntas como:
+
+¿Cuáles son las características principales de los Pokémon?
+
+¿Existen tipos con estadísticas notablemente superiores o inferiores?
+
+¿Qué diferencias hay entre Pokémon legendarios y no legendarios?
+
+#Exploración y limpieza de datos
+Carga de librerías
+```{r}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(magrittr)
+library(knitr)
+```
+
+Cargar el dataset
+```{r}
+pokemon_data <- read_csv(file.choose())
+```
+
+Exploración inicial 
+```{r cars}
+head(pokemon_data)
+str(pokemon_data)
+summary(pokemon_data)
+
+```
+
+Vista preliminar
+```{r}
+head(pokemon_data)
+str(pokemon_data)
+summary(pokemon_data)
+```
+
+Valores faltantes y duplicados
+```{r}
+colSums(is.na(pokemon_data))
+sum(duplicated(pokemon_data))
+
+```
+
+Limpieza de valores NA y transformación
+```{r}
+pokemon_data_cleaned <- pokemon_data %>%
+  mutate(`Type 2` = replace_na(`Type 2`, "None"))
+
+pokemon_data_transformed <- pokemon_data_cleaned %>%
+  mutate(
+    Total_Stats = HP + Attack + Defense + `Sp. Atk` + `Sp. Def` + Speed,
+    Legendary = as.factor(ifelse(Legendary == TRUE, "Legendary", "Not Legendary"))
+  )
+```
+
+Medidas de tendencia central
+```{r}
+pokemon_data_transformed %>%
+  summarise(
+    media_HP = mean(HP, na.rm = TRUE),
+    mediana_HP = median(HP, na.rm = TRUE),
+    media_Ataque = mean(Attack, na.rm = TRUE),
+    mediana_Ataque = median(Attack, na.rm = TRUE),
+    media_TotalStats = mean(Total_Stats, na.rm = TRUE),
+    mediana_TotalStats = median(Total_Stats, na.rm = TRUE)
+  ) %>%
+  kable()
+
+```
+
+#Semana 3- Visualización y análisis 
+Histograma 
+```{r}
+ggplot(pokemon_data_transformed, aes(x = Total_Stats, fill = Legendary)) +
+  geom_histogram(binwidth = 20, color = "black", alpha = 0.7) +
+  labs(
+    title = "Distribución de la Estadística Total de Pokémon",
+    x = "Estadística Total",
+    y = "Número de Pokémon",
+    fill = "Estado Legendario"
+  ) +
+  theme_minimal() +
+  facet_wrap(~ Legendary, scales = "free_y")
+
+#Los Pokémon legendarios tienden a concentrarse en las estadísticas más altas. La mayoría de los no legendarios tienen Total_Stats por debajo de 500.
+```
+
+Diagrama de dispersión (Ataque vs Desensa por tipo de Pokémon)
+```{r}
+ggplot(pokemon_data_transformed, aes(x = Attack, y = Defense, color = `Type 1`)) +
+  geom_point(alpha = 0.7, size = 3) +
+  scale_color_viridis_d() +
+  labs(
+    title = "Relación Ataque-Defensa por Tipo",
+    x = "Ataque",
+    y = "Defensa",
+    color = "Tipo Principal"
+  ) +
+  theme_minimal()
+#La relación entre ataque y defensa varía según el tipo de Pokémon. Algunos tipos como "Fighting" o "Dragon" destacan con mejor ataque.
+```
+
+Boxplot de Ataque por tipo principal
+```{r}
+ggplot(pokemon_data_transformed, 
+       aes(x = reorder(`Type 1`, Attack, median), 
+           y = Attack, 
+           fill = `Type 1`)) +
+  geom_boxplot() +
+  labs(
+    title = "Distribución del Ataque por Tipo Principal",
+    x = "Tipo Principal",
+    y = "Ataque"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "none"
+  ) +
+  coord_flip()
+
+#Los tipos como "Dragon", "Fighting" o "Psychic" tienden a tener mayor ataque, por lo  que su rol en batalla se enfoca en ofensiva directa.
+
+```
+
+#Semana 4- Conclusión general y publicación en Github
+
+Este análisis permitió conocer las estadísticas base de los Pokémon, su clasificación y distribución entre tipos y niveles de poder. Se observó que los Pokémon legendarios tienen significativamente mayores estadísticas que los no legendarios. Además, el tipo de Pokémon influye en sus roles y fortalezas.
+
+Dentro de los principales hallazgos se obervo que los tipos Dragon y Steel presentaron las estadísticas totales más altas, confirmando su ventaja competitiva. Lo que muestra ua completa brecha competitiva, puesto que los Pokémon legendarios tienen en promedio 200 puntos más en estadísticas totales que los no legendarios, sin embargo su rareza es una desventaja. 
+
+Además, no se encontró una correlación fuerte entre Ataque y Defensa, pero sí patrones por tipo:
+
+Fighting y Dragon: Alto ataque, defensa media.
+
+Steel y Rock: Alta defensa, ataque medio.
+
+Este análisis permite que los jugadores puedan elegir mejor sus pokémon para futuras batallas y lograr salir con éxito. Sin embargo, cabe destacar que se han presentado limitaciones en el manejo de los datos, lo que demoró el proceso de análisis, pero a futuro se pueden realizar análisis de "outliers", que son Pokémon que rompen son los patrones de su tipo y de esta forma usarlo para las estrategías en las batallas y determinar sí capturarlo es util. 
+
+
+
