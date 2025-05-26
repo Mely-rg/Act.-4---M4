@@ -154,5 +154,6 @@ Steel y Rock: Alta defensa, ataque medio.
 
 Este análisis permite que los jugadores puedan elegir mejor sus pokémon para futuras batallas y lograr salir con éxito. Sin embargo, cabe destacar que se han presentado limitaciones en el manejo de los datos, lo que demoró el proceso de análisis, pero a futuro se pueden realizar análisis de "outliers", que son Pokémon que rompen son los patrones de su tipo y de esta forma usarlo para las estrategías en las batallas y determinar sí capturarlo es util. 
 
+  Git hub: https://github.com/Mely-rg/Act.-4---M4.git
 
 
