@@ -33,7 +33,7 @@ library(knitr)
 
 Cargar el dataset
 ```{r}
-pokemon_data <- read_csv(file.choose())
+pokemon_data <- read_csv("final_pokemon.csv")
 ```
 
 Exploración inicial 
